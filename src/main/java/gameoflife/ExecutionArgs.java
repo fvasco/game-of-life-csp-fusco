@@ -1,16 +1,11 @@
 package gameoflife;
 
-import gameoflife.concurrent.BlockingRendezVous;
-
 public record ExecutionArgs(String patternFile, int maxWindowWidth, int maxWindowHeight,
-                            int periodMilliseconds,
+                            long periodMilliseconds,
                             int leftPadding, int topPadding, int rightPadding, int bottomPadding,
-                            boolean rotate, boolean toroidal, boolean logRate, boolean useVirtualThreads, boolean threadPerCell,
-                            BlockingRendezVous.Type type) {
-
-    private static final boolean USE_VIRTUAL_THREADS = true;
-    private static final boolean THREAD_PER_CELL = USE_VIRTUAL_THREADS;
-
+                            boolean rotate, boolean toroidal, boolean logRate,
+                            boolean useVirtualThreads
+) {
     private static final String DEFAULT_PATTERN = "patterns/gosper_glider_gun.txt";
     private static final int DEFAULT_MAX_WINDOW_WIDTH = 1280;
     private static final int DEFAULT_MAX_WINDOW_HEIGHT = 960;
@@ -19,8 +14,6 @@ public record ExecutionArgs(String patternFile, int maxWindowWidth, int maxWindo
     private static final boolean DEFAULT_TOROIDAL = false;
     private static final boolean DEFAULT_LOG_RATE = true;
     private static final int DEFAULT_PADDING = 25;
-
-    private static final BlockingRendezVous.Type DEFAULT_TYPE = BlockingRendezVous.Type.LockedSingleValue;
 
     public static ExecutionArgs parse(String[] args) {
         // TODO not interested yet into type setting for the main execution use case
@@ -36,12 +29,11 @@ public record ExecutionArgs(String patternFile, int maxWindowWidth, int maxWindo
                 args.length > 8 ? Boolean.parseBoolean(args[8]) : DEFAULT_ROTATE,
                 args.length > 8 ? Boolean.parseBoolean(args[9]) : DEFAULT_TOROIDAL,
                 args.length > 9 ? Boolean.parseBoolean(args[10]) : DEFAULT_LOG_RATE,
-                args.length > 9 ? Boolean.parseBoolean(args[11]) : USE_VIRTUAL_THREADS,
-                args.length > 9 ? Boolean.parseBoolean(args[12]) : THREAD_PER_CELL,
-                DEFAULT_TYPE);
+                args.length > 10 ? Boolean.parseBoolean(args[11]) : false
+        );
     }
 
-    public static ExecutionArgs create(int padding, boolean useVirtualThreads, boolean threadPerCell, BlockingRendezVous.Type type) {
+    public static ExecutionArgs create(int padding, boolean useVirtualThreads) {
         return new ExecutionArgs(
                 DEFAULT_PATTERN,
                 DEFAULT_MAX_WINDOW_WIDTH,
@@ -54,9 +46,8 @@ public record ExecutionArgs(String patternFile, int maxWindowWidth, int maxWindo
                 DEFAULT_ROTATE,
                 DEFAULT_TOROIDAL,
                 DEFAULT_LOG_RATE,
-                useVirtualThreads,
-                threadPerCell,
-                type);
+                useVirtualThreads
+        );
     }
 
     @Override
@@ -67,8 +58,6 @@ public record ExecutionArgs(String patternFile, int maxWindowWidth, int maxWindo
                 ", rotate=" + rotate +
                 ", toroidal=" + toroidal +
                 ", logRate=" + logRate +
-                ", useVirtualThreads=" + useVirtualThreads +
-                ", threadPerCell=" + threadPerCell +
                 '}';
     }
 }

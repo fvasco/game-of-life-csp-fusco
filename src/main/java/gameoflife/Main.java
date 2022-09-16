@@ -1,13 +1,9 @@
 package gameoflife;
 
-import java.io.IOException;
-import java.util.function.Consumer;
-
-import gameoflife.domain.Dimensions;
 import gameoflife.ui.WindowOutput;
+import java.io.IOException;
 
 public class Main {
-
     public static void main(String[] args) throws IOException {
         execute(ExecutionArgs.parse(args));
     }

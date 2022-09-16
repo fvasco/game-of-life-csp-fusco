@@ -1,25 +1,13 @@
 # Game of Life CSP
 
-Game of Life CSP is a Java implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
+Game of Life CSP is a Kotlin implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
 using [communicating sequential processes (CSP)](https://en.wikipedia.org/wiki/Communicating_sequential_processes). 
 
-This project adds to the [original virtual threads based implementation](https://github.com/ebarlas/game-of-life-csp), from which it has been forked, the possibility to also run it on native threads, mostly with the purpose of measuring the scheduling overhead introduced by the management of a large number of virtual threads.
+This project adds to the [original virtual threads based implementation](https://github.com/mariofusco/game-of-life-csp), from which it has been forked, the possibility to also run it on kotlinx.coroutines default dispatcher.
 
-## Virtual Threads implementation
+## Kotlin implementation
 
-Each grid cell is an independent process and all cell communication occurs via channels.
-
-It's built atop virtual threads, defined in [JDK Enhancement Proposal (JEP) 425](https://openjdk.java.net/jeps/425).
-
-The virtual threads feature is part of [Project Loom](https://openjdk.java.net/projects/loom/).
-
-Prior to Project Loom and virtual threads, CSP style programming with a so large number of threads simply wasn't available in Java.
-
-## Native Threads implementation
-
-In this second version it uses an executors with a fixed number of native threads equal to the number of available cores of the running machine.
-
-The CSP style of the implementation is left unchanged, but the cells (and the computation of their state) are simply splitted equally on n-1 threads, while the n-th thread is dedicated to the coordination of other threads and to publish the result on the user interface.
+Each grid cell is an independent coroutine and all cell communication occurs via channels.
 
 ![Channels](images/game-of-life-channels.png)
 
@@ -39,17 +27,6 @@ java --enable-preview -cp target/classes/ gameoflife.Main
 ```
 
 ---
-Compile with `javac`:
-```
-javac --enable-preview -source 19 src/main/java/gameoflife/*.java -d build/
-```
-
-Run:
-```
-java --enable-preview -cp build/ gameoflife.Main
-```
-
----
 ![Gosper Glider Gun](images/gosper-glider-gun.gif)
 
 ## Command Line Arguments
@@ -57,7 +34,7 @@ java --enable-preview -cp build/ gameoflife.Main
 Command line arguments are optional.
 
 ```
-java --enable-preview -cp target/classes/ gameoflife.Main patterns/spaceship.txt 1800 1200 20 50 50 5 5 false true
+java --enable-preview -cp target/classes/ gameoflife.Main patterns/spaceship.txt 1800 1200 20 50 50 5 5 false
 ```
 
 1. Pattern text file, ex. `patterns/spaceship.txt`
@@ -71,8 +48,7 @@ java --enable-preview -cp target/classes/ gameoflife.Main patterns/spaceship.txt
 9. Rotate boolean flag, ex. `false`
 10. Toroidal boolean flag, ex. `false`
 11. Log rate boolean flag, ex. `true`
-12. Use virtual threads, ex. `true`
-13. Use a thread per cell (otherwise a thread per core), ex. `true`
+12. Use virtual threads, ex. `false`
 
 ## Patterns
 
@@ -124,9 +100,10 @@ The following command results in a grid of 50,000 cells (250 x 200):
 That results in `50,002` virtual threads and `497,305` channels.
 
 ```
-java --enable-preview -cp target/classes/ gameoflife.Main patterns/puffer_train.txt 1600 800 0 235 91 10 91 true true
+java --enable-preview -cp target/classes/ gameoflife.Main patterns/puffer_train.txt 1600 800 0 235 91 10 91 true
 ```
 
-It's a demonstration of the viability of virtual threads in a highly concurrent, computationally intensive application.
+It's a demonstration of the viability of coroutine in a highly concurrent, computationally intensive application, with or without Java's virtual thread.
 
 ![Puffer Train](images/puffer-train.gif)
+

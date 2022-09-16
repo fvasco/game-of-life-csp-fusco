@@ -4,3 +4,7 @@ target/
 *.iml
 *.log
 tmp/
+/dependency-reduced-pom.xml
+/mvnw
+/mvnw.cmd
+/.mvn/
