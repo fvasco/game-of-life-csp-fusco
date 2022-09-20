@@ -15,7 +15,8 @@ class GameOfLife(
     private val period: Long,
     val gridChannel: Channel<Array<BooleanArray>>,
     private val logRate: Boolean,
-    dispatcher: CoroutineDispatcher
+    dispatcher: CoroutineDispatcher,
+    channelSize: Int = 1
 ) : CoroutineScope {
 
     private val cells: MutableList<Cell> = ArrayList()
@@ -34,7 +35,7 @@ class GameOfLife(
         dimensions.forEachRowCol { r: Int, c: Int -> cells.add(grid[r][c]) }
         dimensions.forEachRowCol { r: Int, c: Int ->
             dimensions.forEachNeighbor(r, c) { ri: Int, ci: Int ->
-                val ch = Channel<Boolean>(1)
+                val ch = Channel<Boolean>(channelSize)
                 grid[r][c].addInChannel(ch)
                 grid[ri][ci].addOutChannel(ch)
             }

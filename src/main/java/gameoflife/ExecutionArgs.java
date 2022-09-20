@@ -4,7 +4,7 @@ public record ExecutionArgs(String patternFile, int maxWindowWidth, int maxWindo
                             long periodMilliseconds,
                             int leftPadding, int topPadding, int rightPadding, int bottomPadding,
                             boolean rotate, boolean toroidal, boolean logRate,
-                            boolean useVirtualThreads
+                            boolean useVirtualThreads, int channelSize
 ) {
     private static final String DEFAULT_PATTERN = "patterns/gosper_glider_gun.txt";
     private static final int DEFAULT_MAX_WINDOW_WIDTH = 1280;
@@ -29,11 +29,12 @@ public record ExecutionArgs(String patternFile, int maxWindowWidth, int maxWindo
                 args.length > 8 ? Boolean.parseBoolean(args[8]) : DEFAULT_ROTATE,
                 args.length > 8 ? Boolean.parseBoolean(args[9]) : DEFAULT_TOROIDAL,
                 args.length > 9 ? Boolean.parseBoolean(args[10]) : DEFAULT_LOG_RATE,
-                args.length > 10 ? Boolean.parseBoolean(args[11]) : false
+                args.length > 10 ? Boolean.parseBoolean(args[11]) : false,
+                args.length > 11 ? Integer.parseInt(args[12]) : 1
         );
     }
 
-    public static ExecutionArgs create(int padding, boolean useVirtualThreads) {
+    public static ExecutionArgs create(int padding, boolean useVirtualThreads, int channelSize) {
         return new ExecutionArgs(
                 DEFAULT_PATTERN,
                 DEFAULT_MAX_WINDOW_WIDTH,
@@ -46,7 +47,8 @@ public record ExecutionArgs(String patternFile, int maxWindowWidth, int maxWindo
                 DEFAULT_ROTATE,
                 DEFAULT_TOROIDAL,
                 DEFAULT_LOG_RATE,
-                useVirtualThreads
+                useVirtualThreads,
+                channelSize
         );
     }
 

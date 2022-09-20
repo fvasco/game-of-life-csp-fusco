@@ -16,6 +16,9 @@ public class GameOfLifeBenchmark {
     @Param({"5", "25", "100"}) // 874, 5074, 49324 cells
     private int padding;
 
+    @Param({"1", "2147483647"}) // size=1, unlimited
+    private int channelSize;
+
     @Param({"true", "false"})
     private boolean useVirtualThreads;
 
@@ -23,7 +26,7 @@ public class GameOfLifeBenchmark {
 
     @Setup
     public void setup() {
-        ExecutionArgs args = ExecutionArgs.create(padding, useVirtualThreads);
+        ExecutionArgs args = ExecutionArgs.create(padding, useVirtualThreads, channelSize);
         gameOfLife = GameOfLife.create(args);
         gameOfLife.startCells();
     }
