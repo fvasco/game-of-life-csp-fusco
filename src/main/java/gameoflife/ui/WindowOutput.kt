@@ -32,11 +32,11 @@ class WindowOutput private constructor(private val gameOfLife: GameOfLife, args:
     internal inner class Canvas : JPanel() {
         override fun paint(g: Graphics) {
             super.paint(g)
-            if (cells == null) return
+            if (cells .isEmpty()) return
             g.color = Color.WHITE
             g.fillRect(0, 0, width, height)
             g.color = Color.LIGHT_GRAY
-            val cellWidth = width / cells!![0].size
+            val cellWidth = width / cells[0].size
             run {
                 var x = 0
                 while (x <= width) {
@@ -44,7 +44,7 @@ class WindowOutput private constructor(private val gameOfLife: GameOfLife, args:
                     x += cellWidth
                 }
             }
-            val cellHeight = height / cells!!.size
+            val cellHeight = height / cells.size
             run {
                 var y = 0
                 while (y <= height) {
@@ -53,9 +53,9 @@ class WindowOutput private constructor(private val gameOfLife: GameOfLife, args:
                 }
             }
             g.color = Color.BLACK
-            for (r in cells!!.indices) {
-                for (c in cells!![r].indices) {
-                    if (cells!![r][c]) {
+            for (r in cells.indices) {
+                for (c in cells[r].indices) {
+                    if (cells[r][c]) {
                         g.fillRect(c * cellWidth, r * cellHeight, cellWidth, cellHeight)
                     }
                 }

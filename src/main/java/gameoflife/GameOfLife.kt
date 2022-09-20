@@ -5,7 +5,6 @@ import gameoflife.domain.ChannelsGrid
 import gameoflife.domain.Dimensions
 import gameoflife.ui.PatternParser
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlin.coroutines.CoroutineContext
 
@@ -19,17 +18,20 @@ class GameOfLife(
     channelSize: Int = 1
 ) : CoroutineScope {
 
-    private val cells: MutableList<Cell> = ArrayList()
-    private val tick = BroadcastChannel<Unit>(1)
+    private val cells = ArrayList<Cell>()
+    private val tickChannels: MutableList<Channel<Unit>>
     private val resultChannels = ChannelsGrid<Boolean>(dimensions)
     private var lastStatsDump = System.nanoTime()
-    private var framesCount: Long = 0
+    private var framesCount = 0L
     override val coroutineContext: CoroutineContext = Job() + dispatcher
 
     init {
+        tickChannels = ArrayList(dimensions.rows * dimensions.cols)
         val grid = Array(dimensions.rows) { r ->
             Array(dimensions.cols) { c ->
-                Cell(seed[r][c], tick.openSubscription(), resultChannels[r, c])
+                val tickChannel = Channel<Unit>(channelSize)
+                tickChannels += tickChannel
+                Cell(seed[r][c], tickChannel, resultChannels[r, c])
             }
         }
         dimensions.forEachRowCol { r: Int, c: Int -> cells.add(grid[r][c]) }
@@ -48,7 +50,9 @@ class GameOfLife(
     }
 
     fun startCells() {
-        cells.forEach { cell -> launch(start = CoroutineStart.UNDISPATCHED) { cell.run() } }
+        cells.forEach { cell ->
+            launch(start = CoroutineStart.UNDISPATCHED) { cell.run() }
+        }
     }
 
     fun startGame() {
@@ -62,7 +66,7 @@ class GameOfLife(
     }
 
     suspend fun calculateFrame(): Array<BooleanArray> {
-        tick.send(Unit)
+        tickChannels.forEach { it.send(Unit) }
         val grid = Array(dimensions.rows) { r ->
             BooleanArray(dimensions.cols) { c ->
                 resultChannels[r, c].receive()
@@ -80,7 +84,7 @@ class GameOfLife(
         }
 
     private suspend fun endOfFrame() {
-        delay(period)
+        if (period > 0) delay(period)
         if (logRate) {
             framesCount++
             if (System.nanoTime() - lastStatsDump >= 1_000_000_000) {
@@ -121,8 +125,7 @@ class GameOfLife(
                 args.periodMilliseconds(),
                 gridChannel,
                 args.logRate(),
-                if (args.useVirtualThreads) Dispatchers.virtualThread
-                else Dispatchers.Default
+                args.dispatcherType.dispatcher
             )
     }
 }
