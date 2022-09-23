@@ -19,21 +19,19 @@ import org.openjdk.jmh.annotations.Warmup;
 
 @State(Scope.Benchmark)
 @Warmup(iterations = 5)
-@Measurement(iterations = 10)
+@Measurement(iterations = 5)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @Fork(2)
 public class GameOfLifeBenchmark {
 
-    @Param({"true", "false"})
-    private boolean useVirtualThreads;
+    private final boolean useVirtualThreads = true;
 
-    @Param({"true", "false"})
-    private boolean threadPerCell;
+    private final boolean threadPerCell = true;
 
-    @Param({"5", "25", "100"}) // 874, 5074, 49324 cells
+    @Param({"10", "100"})
     private int padding;
 
-    @Param({"BlockingQueue", "BlockingTransfer", "LockedSingleValue", "OneToOneParking"})
+    @Param({"BlockingQueue", "BlockingTransfer"})
     private String channelType;
 
     private GameOfLife gameOfLife;

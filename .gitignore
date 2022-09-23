@@ -4,3 +4,6 @@ target/
 *.iml
 *.log
 tmp/
+/mvnw.cmd
+/mvnw
+/.mvn/
